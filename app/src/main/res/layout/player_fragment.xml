@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <import type="android.R"/>
+        <import type="com.zachary_moore.moodlights.data.SwatchStateManager"/>
+        <variable
+            name="viewModel"
+            type="com.zachary_moore.moodlights.data.PlayerViewModel"/>
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/moodlight_frequency_slider"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_slider_label"
+            android:valueFrom="@{SwatchStateManager.MIN_FREQUENCY}"
+            android:valueTo="@{SwatchStateManager.MAX_FREQUENCY}"
+            android:value="@{SwatchStateManager.INITIAL_FREQUENCY}"
+            android:stepSize="@{SwatchStateManager.FREQUENCY_STEP_COUNT}"/>
+
+        <TextView
+            android:id="@+id/moodlight_slider_label"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/moodlight_frequency_slider"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_song_name"
+            android:text="@string/moodlight_frequency_label" />
+
+        <TextView
+            android:id="@+id/moodlight_song_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.spotifyFeature.currentTrackName}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_artist_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/moodlight_slider_label"
+            tools:text="Song name" />
+
+        <TextView
+            android:id="@+id/moodlight_artist_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:text="@{viewModel.spotifyFeature.currentArtistName}"
+            app:layout_constraintTop_toBottomOf="@id/moodlight_song_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Artist name"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_control_container"/>
+
+        <LinearLayout
+            android:id="@+id/moodlight_control_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/moodlight_artist_name"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_album_image">
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:background="@android:drawable/ic_media_previous"
+                android:contentDescription="@string/moodlight_previous_content_description"
+                android:onClick="@{() -> viewModel.spotifyFeature.previous()}"/>
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:contentDescription="@string/moodlight_toggle_play_pause_description"
+                app:backgroundResource="@{viewModel.spotifyFeature.isPaused() ? R.drawable.ic_media_play : R.drawable.ic_media_pause}"
+                tools:src="@android:drawable/ic_media_play"
+                android:onClick="@{() -> viewModel.spotifyFeature.togglePlay()}"/>
+
+            <ImageButton
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:paddingStart="2dp"
+                android:paddingEnd="2dp"
+                android:contentDescription="@string/moodlight_next_content_description"
+                android:background="@android:drawable/ic_media_next"
+                android:onClick="@{() -> viewModel.spotifyFeature.next()}"/>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/moodlight_album_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:imageBitmap="@{viewModel.spotifyFeature.currentPlayingAlbumImage()}"
+            tools:src="@drawable/ic_launcher_foreground"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/moodlight_control_container"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_album_name" />
+
+        <TextView
+            android:id="@+id/moodlight_album_name"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+            android:paddingTop="12dp"
+            android:text="@{viewModel.spotifyFeature.currentAlbumName}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/moodlight_album_image"
+            tools:text="album name" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_margin="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/moodlight_album_name"
+            android:onClick="@{() -> viewModel.hueDiscoveryFeature.resetSavedDiscoveryCredentials(context)}"
+            android:text="@string/moodlight_reset_bridge_button"
+            app:layout_constraintHorizontal_bias="1.0"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
