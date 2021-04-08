@@ -1,7 +1,12 @@
 package com.zachary_moore.moodlights.data
 
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,9 +15,14 @@ import androidx.lifecycle.Transformations
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp
+import com.spotify.android.appremote.api.error.NotLoggedInException
+import com.spotify.android.appremote.api.error.UserNotAuthorizedException
 import com.spotify.protocol.types.ImageUri
 import com.spotify.protocol.types.Track
 import com.zachary_moore.moodlights.BuildConfig
+import com.zachary_moore.moodlights.R
+
 
 class SpotifyFeature {
     private val appRemote: MutableLiveData<SpotifyAppRemote> = MutableLiveData()
@@ -22,30 +32,30 @@ class SpotifyFeature {
 
     // Expose direct maps since they are immutable
     private val currentPlayingAlbumImage = Transformations.distinctUntilChanged(
-        Transformations.map(currentTrack) {
-            it.imageUri
-        }
+            Transformations.map(currentTrack) {
+                it.imageUri
+            }
     )
     val currentTrackName = Transformations.distinctUntilChanged(
-        Transformations.map(currentTrack) {
-            it.name
-        }
+            Transformations.map(currentTrack) {
+                it.name
+            }
     )
     val currentArtistName = Transformations.distinctUntilChanged(
-        Transformations.map(currentTrack) {
-            it.artist.name
-        }
+            Transformations.map(currentTrack) {
+                it.artist.name
+            }
     )
     val currentAlbumName = Transformations.distinctUntilChanged(
-        Transformations.map(currentTrack) {
-            it.album.name
-        }
+            Transformations.map(currentTrack) {
+                it.album.name
+            }
     )
 
     private val connectionParams = ConnectionParams.Builder(BuildConfig.spotifyClientId)
-        .setRedirectUri(BuildConfig.spotifyRedirectUri)
-        .showAuthView(true)
-        .build()
+            .setRedirectUri(BuildConfig.spotifyRedirectUri)
+            .showAuthView(true)
+            .build()
 
     private val appRemoteObserver: Observer<SpotifyAppRemote> = getSpotifyAppRemoteObserver()
     private val currentAlbumImageObserver: Observer<ImageUri> = getCurrentPlayingAlbumImageObserver()
@@ -111,24 +121,25 @@ class SpotifyFeature {
     /**
      * Initialize Spotify remote and setup connector callback
      */
-    fun initializeRemote(context: Context) {
+    fun initializeRemote(activity: Activity) {
         SpotifyAppRemote.connect(
-            context,
-            connectionParams,
-            object : Connector.ConnectionListener {
-                override fun onFailure(throwable: Throwable?) {
-                    Log.e(
-                        TAG,
-                        throwable?.message,
-                        throwable
-                    )
-                }
+                activity,
+                connectionParams,
+                object : Connector.ConnectionListener {
+                    override fun onFailure(throwable: Throwable?) {
+                        Log.e(
+                                TAG,
+                                throwable?.message,
+                                throwable
+                        )
+                        handleSpotifyError(throwable, activity)
+                    }
 
-                override fun onConnected(appRemote: SpotifyAppRemote) {
-                    this@SpotifyFeature.appRemote.value = appRemote
-                }
+                    override fun onConnected(appRemote: SpotifyAppRemote) {
+                        this@SpotifyFeature.appRemote.postValue(appRemote)
+                    }
 
-            }
+                }
         )
     }
 
@@ -171,5 +182,70 @@ class SpotifyFeature {
 
     companion object {
         private const val TAG = "SpotifyFeature"
+        private const val appPackageName = "com.spotify.music"
+        private const val referrer = "adjust_campaign=PACKAGE_NAME&adjust_tracker=ndjczk&utm_source=adjust_preinstall"
+
+        private fun promptSpotifyDownload(context: Context) {
+            try {
+                val uri: Uri = Uri.parse("market://details")
+                        .buildUpon()
+                        .appendQueryParameter("id", appPackageName)
+                        .appendQueryParameter("referrer", referrer)
+                        .build()
+                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+            } catch (ignored: ActivityNotFoundException) {
+                val uri: Uri = Uri.parse("https://play.google.com/store/apps/details")
+                        .buildUpon()
+                        .appendQueryParameter("id", appPackageName)
+                        .appendQueryParameter("referrer", referrer)
+                        .build()
+                context.startActivity(Intent(Intent.ACTION_VIEW, uri))
+            }
+        }
+
+        private fun handleSpotifyError(
+                throwable: Throwable?,
+                activity: Activity
+        ) {
+            when (throwable) {
+                is CouldNotFindSpotifyApp -> AlertDialog.Builder(activity)
+                        .setTitle(R.string.moodlight_could_not_find_spotify_title)
+                        .setMessage(R.string.moodlight_could_not_find_spotify_description)
+                        .setPositiveButton(R.string.moodlight_could_not_find_spotify_go_to_download) { dialog, _ ->
+                            dialog.dismiss()
+                            promptSpotifyDownload(activity)
+                        }
+                        .setNegativeButton(R.string.moodlight_could_not_find_spotify_exit) { dialog, _ ->
+                            dialog.dismiss()
+                            // Exit app
+                            activity.finishAffinity()
+                        }
+                        .show()
+                is UserNotAuthorizedException -> AlertDialog.Builder(activity)
+                        .setTitle(R.string.moodlight_spotify_auth_fail_title)
+                        .setMessage(R.string.moodlight_spotify_auth_fail_description)
+                        .setPositiveButton(R.string.moodlight_spotify_auth_fail_exit) { dialog, _ ->
+                            dialog.dismiss()
+                            // Exit app
+                            activity.finishAffinity()
+                        }
+                        .setNegativeButton(R.string.moodlight_spotify_auth_fail_cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                is NotLoggedInException -> AlertDialog.Builder(activity)
+                        .setTitle(R.string.moodlight_spotify_login_fail_title)
+                        .setMessage(R.string.moodlight_spotify_login_fail_description)
+                        .setPositiveButton(R.string.moodlight_spotify_login_fail_exit) { dialog, _ ->
+                            dialog.dismiss()
+                            // Exit app
+                            activity.finishAffinity()
+                        }
+                        .setNegativeButton(R.string.moodlight_spotify_login_fail_cancel) { dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+            }
+        }
     }
 }

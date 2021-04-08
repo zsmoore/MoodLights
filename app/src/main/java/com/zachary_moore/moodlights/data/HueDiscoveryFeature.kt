@@ -20,24 +20,24 @@ class HueDiscoveryFeature {
         }
 
         val sharedPreferences = context.getSharedPreferences(
-            SHARED_PREFERENCES_FILE,
-            Context.MODE_PRIVATE
+                SHARED_PREFERENCES_FILE,
+                Context.MODE_PRIVATE
         )
 
         val ip = sharedPreferences.getString(IP_KEY, null)
         val username = sharedPreferences.getString(USERNAME_KEY, null)
 
         val alertDialog = AlertDialog.Builder(context)
-            .setTitle(R.string.moodlight_press_bridge_title)
-            .setMessage(R.string.moodlight_press_bridge_description)
-            .setNegativeButton(R.string.moodlight_press_bridge_cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
+                .setTitle(R.string.moodlight_press_bridge_title)
+                .setMessage(R.string.moodlight_press_bridge_description)
+                .setNegativeButton(R.string.moodlight_press_bridge_cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }
         if (ip == null && username == null) {
             alertDialog.setPositiveButton(R.string.moodlight_press_bridge_continue) { dialog, _ ->
                 Kontrollr.createWithAutoIpAndUsername(
-                    APPLICATION_NAME,
-                    DEVICE_NAME
+                        APPLICATION_NAME,
+                        DEVICE_NAME
                 ) { kontrollr ->
                     sharedPreferences.edit().putString(IP_KEY, kontrollr.bridgeIpAddress).apply()
                     sharedPreferences.edit().putString(USERNAME_KEY, kontrollr.userName).apply()
@@ -49,9 +49,9 @@ class HueDiscoveryFeature {
         } else if (username == null && ip != null) {
             alertDialog.setPositiveButton(R.string.moodlight_press_bridge_continue) { dialog, _ ->
                 Kontrollr.createWithIpAndAutoCreateUsername(
-                    ip,
-                    APPLICATION_NAME,
-                    DEVICE_NAME
+                        ip,
+                        APPLICATION_NAME,
+                        DEVICE_NAME
                 ) { kontrollr ->
                     sharedPreferences.edit().putString(IP_KEY, kontrollr.bridgeIpAddress).apply()
                     sharedPreferences.edit().putString(USERNAME_KEY, kontrollr.userName).apply()
@@ -67,35 +67,35 @@ class HueDiscoveryFeature {
 
     fun resetSavedDiscoveryCredentials(context: Context) {
         AlertDialog.Builder(context)
-            .setTitle(R.string.moodlight_reset_bridge_title)
-            .setMessage(R.string.moodlight_reset_brdige_description)
-            .setPositiveButton(R.string.moodlight_reset_bridge_reset) { dialog, _ ->
-                dialog.dismiss()
-                doResetDiscoveryCredentials(context)
-            }
-            .setNegativeButton(R.string.moodlight_reset_bridge_cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+                .setTitle(R.string.moodlight_reset_bridge_title)
+                .setMessage(R.string.moodlight_reset_brdige_description)
+                .setPositiveButton(R.string.moodlight_reset_bridge_reset) { dialog, _ ->
+                    dialog.dismiss()
+                    doResetDiscoveryCredentials(context)
+                }
+                .setNegativeButton(R.string.moodlight_reset_bridge_cancel) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
     }
 
     private fun doResetDiscoveryCredentials(context: Context) {
         val sharedPreferences = context.getSharedPreferences(
-            SHARED_PREFERENCES_FILE,
-            Context.MODE_PRIVATE
+                SHARED_PREFERENCES_FILE,
+                Context.MODE_PRIVATE
         )
 
         sharedPreferences.edit().remove(USERNAME_KEY).apply()
         sharedPreferences.edit().remove(IP_KEY).apply()
-        kontrollrLiveData.value = null
+        kontrollrLiveData.postValue(null)
 
         AlertDialog.Builder(context)
-            .setTitle(R.string.moodlight_saved_bridge_cleared_title)
-            .setMessage(R.string.moodlight_saved_bridge_cleared_description)
-            .setPositiveButton(R.string.moodlight_saved_bridge_cleared_ok) { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
+                .setTitle(R.string.moodlight_saved_bridge_cleared_title)
+                .setMessage(R.string.moodlight_saved_bridge_cleared_description)
+                .setPositiveButton(R.string.moodlight_saved_bridge_cleared_ok) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
     }
 
     companion object {
@@ -105,5 +105,4 @@ class HueDiscoveryFeature {
         private const val APPLICATION_NAME = "MoodLights"
         private const val DEVICE_NAME = "MoodLights_Android"
     }
-
 }

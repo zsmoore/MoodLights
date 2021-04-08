@@ -61,7 +61,7 @@ class SwatchStateManager {
             if (swatch == it.dominantSwatch) {
                 DOMINANT_DISPLAY_TIME_MS
             } else {
-               NON_DOMINANT_DISPLAY_TIME_MS
+                NON_DOMINANT_DISPLAY_TIME_MS
             }
         } ?: NON_DOMINANT_DISPLAY_TIME_MS)
     }

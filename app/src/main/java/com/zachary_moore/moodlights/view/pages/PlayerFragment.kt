@@ -16,7 +16,7 @@ import com.zachary_moore.moodlights.view.ads.AdManager
 import com.zachary_moore.moodlights.view.ads.AdManager.Companion.addBannerAd
 
 
-class PlayerFragment: Fragment() {
+class PlayerFragment : Fragment() {
 
     private lateinit var playerFragmentBinding: PlayerFragmentBinding
     private lateinit var playerViewModel: PlayerViewModel
@@ -27,15 +27,15 @@ class PlayerFragment: Fragment() {
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         playerFragmentBinding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.player_fragment,
-            container,
-            false
+                inflater,
+                R.layout.player_fragment,
+                container,
+                false
         )
 
         playerFragmentBinding.moodlightBannerAdContainer.addBannerAd(requireActivity())
@@ -62,10 +62,10 @@ class PlayerFragment: Fragment() {
         })
     }
 
-    override  fun onStart() {
+    override fun onStart() {
         super.onStart()
         playerViewModel.spotifyFeature.disconnectRemote()
-        playerViewModel.spotifyFeature.initializeRemote(requireContext())
+        playerViewModel.spotifyFeature.initializeRemote(requireActivity())
         playerViewModel.hueDiscoveryFeature.loadSharedPreferences(requireContext())
     }
 
