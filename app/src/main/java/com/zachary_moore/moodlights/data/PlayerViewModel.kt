@@ -7,11 +7,13 @@ import com.zachary_moore.huekontrollr.Kontrollr
 import com.zachary_moore.huekontrollr.data.light.Light
 import com.zachary_moore.huekontrollr.data.light.State
 import com.zachary_moore.huekontrollr.util.getFromRGB
+import com.zachary_moore.moodlights.view.ads.AdManager
 
 class PlayerViewModel : ViewModel() {
 
     val spotifyFeature = SpotifyFeature()
     val hueDiscoveryFeature = HueDiscoveryFeature()
+    val adManager = AdManager()
     private val swatchStateManager = SwatchStateManager()
     private val threadingManager = ThreadingManager()
 

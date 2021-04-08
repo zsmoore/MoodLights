@@ -93,9 +93,7 @@ class SpotifyFeature {
     fun next() {
         checkNotNull(appRemote.value) {
             "Attempting to access AppRemote before it exists"
-        }.let{
-            it.playerApi.skipNext()
-        }
+        }.playerApi.skipNext()
     }
 
     /**
@@ -107,9 +105,7 @@ class SpotifyFeature {
     fun previous() {
         checkNotNull(appRemote.value) {
             "Attempting to access AppRemote before it exists"
-        }.let{
-            it.playerApi.skipPrevious()
-        }
+        }.playerApi.skipPrevious()
     }
 
     /**

@@ -6,11 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
 import com.zachary_moore.moodlights.R
 import com.zachary_moore.moodlights.data.PlayerViewModel
 import com.zachary_moore.moodlights.databinding.PlayerFragmentBinding
+import com.zachary_moore.moodlights.view.ads.AdManager
+import com.zachary_moore.moodlights.view.ads.AdManager.Companion.addBannerAd
+
 
 class PlayerFragment: Fragment() {
 
@@ -33,22 +37,32 @@ class PlayerFragment: Fragment() {
             container,
             false
         )
+
+        playerFragmentBinding.moodlightBannerAdContainer.addBannerAd(requireActivity())
+
         return playerFragmentBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        playerViewModel.spotifyFeature.initializeRemote(requireContext())
-
         playerFragmentBinding.lifecycleOwner = viewLifecycleOwner
         playerFragmentBinding.viewModel = playerViewModel
+
+        // listen to slider and post updates to viewModel
         playerFragmentBinding.moodlightFrequencySlider.addOnChangeListener { _, value, _ ->
             playerViewModel.updateSliderValue(value)
         }
+
+        // start listening to pause state and conditionally show an interstitial
+        playerViewModel.spotifyFeature.isPaused().observe(viewLifecycleOwner, Observer { isPaused ->
+            if (isPaused && playerViewModel.adManager.shouldShowPauseInterstitial()) {
+                AdManager.showInterstitialAd(requireActivity())
+            }
+        })
     }
 
-    override fun onStart() {
+    override  fun onStart() {
         super.onStart()
         playerViewModel.spotifyFeature.disconnectRemote()
         playerViewModel.spotifyFeature.initializeRemote(requireContext())

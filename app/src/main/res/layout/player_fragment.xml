@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:ads="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.R"/>
         <import type="com.zachary_moore.moodlights.data.SwatchStateManager"/>
@@ -125,7 +126,7 @@
             android:text="@{viewModel.spotifyFeature.currentAlbumName}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_banner_ad_container"
             app:layout_constraintTop_toBottomOf="@id/moodlight_album_image"
             tools:text="album name" />
 
@@ -134,10 +135,19 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_margin="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/moodlight_banner_ad_container"
             app:layout_constraintStart_toEndOf="@id/moodlight_album_name"
             android:onClick="@{() -> viewModel.hueDiscoveryFeature.resetSavedDiscoveryCredentials(context)}"
             android:text="@string/moodlight_reset_bridge_button"
             app:layout_constraintHorizontal_bias="1.0"/>
+
+        <LinearLayout
+            android:id="@+id/moodlight_banner_ad_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

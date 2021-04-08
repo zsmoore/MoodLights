@@ -10,10 +10,11 @@ android {
 
     defaultConfig {
         applicationId "com.zachary_moore.moodlights"
-        minSdkVersion 26
+        minSdkVersion 16
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -50,6 +51,8 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.palette:palette-ktx:1.0.0'
+    implementation 'com.google.android.gms:play-services-ads:20.0.0'
+    implementation "androidx.multidex:multidex:2.0.1"
 
     // mine
     implementation "com.google.code.gson:gson:2.8.5"
