@@ -3,7 +3,10 @@ package com.zachary_moore.moodlights.data
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
@@ -12,9 +15,6 @@ import com.spotify.protocol.types.Track
 import com.zachary_moore.moodlights.BuildConfig
 
 class SpotifyFeature {
-
-    val foregroundRefreshListener = ForegroundRefreshListener(this)
-
     private val appRemote: MutableLiveData<SpotifyAppRemote> = MutableLiveData()
     private val isPaused: MutableLiveData<Boolean> = MutableLiveData()
     private val currentTrack: MutableLiveData<Track> = MutableLiveData()
@@ -157,14 +157,6 @@ class SpotifyFeature {
     }
 
     /**
-     * App was backgrounded, we need to get new update.
-     * Our subscriber will be notified but we need to do a blocking refresh without listening
-     */
-    private fun refreshPlayerState() {
-        appRemote?.value?.playerApi?.playerState?.await()
-    }
-
-    /**
      * Observer for current playing album image.
      *
      * This will request down and get a bitmap based off of the uri.
@@ -178,16 +170,6 @@ class SpotifyFeature {
             it.imagesApi.getImage(currentPlayingAlbumImage).setResultCallback { resultBitmap ->
                 currentPlayingAlbumBitmap.value = resultBitmap
             }
-        }
-    }
-
-    class ForegroundRefreshListener(
-        private val spotifyFeature: SpotifyFeature
-    ) : LifecycleObserver {
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onForeground() {
-            spotifyFeature.refreshPlayerState()
         }
     }
 

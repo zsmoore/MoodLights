@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
 import com.zachary_moore.moodlights.R
@@ -21,9 +20,6 @@ class PlayerFragment: Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         playerViewModel = ViewModelProvider(this).get()
-        ProcessLifecycleOwner.get()
-            .lifecycle
-            .addObserver(playerViewModel.spotifyFeature.foregroundRefreshListener)
     }
 
     override fun onCreateView(
@@ -43,6 +39,8 @@ class PlayerFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        playerViewModel.spotifyFeature.initializeRemote(requireContext())
+
         playerFragmentBinding.lifecycleOwner = viewLifecycleOwner
         playerFragmentBinding.viewModel = playerViewModel
         playerFragmentBinding.moodlightFrequencySlider.addOnChangeListener { _, value, _ ->
@@ -60,12 +58,5 @@ class PlayerFragment: Fragment() {
     override fun onStop() {
         super.onStop()
         playerViewModel.spotifyFeature.disconnectRemote()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        ProcessLifecycleOwner.get()
-            .lifecycle
-            .removeObserver(playerViewModel.spotifyFeature.foregroundRefreshListener)
     }
 }
