@@ -10,6 +10,7 @@ import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.zachary_moore.moodlights.BuildConfig
 
 class AdManager {
 
@@ -34,7 +35,7 @@ class AdManager {
 
             val adView = AdView(activity)
             adView.adSize = getAdSize(activity)
-            adView.adUnitId = "ca-app-pub-3940256099942544/6300978111"
+            adView.adUnitId = BuildConfig.playerFragmentBannerAdId
             adView.loadAd(AdRequest.Builder().build())
             this.removeAllViews()
             this.addView(adView)
@@ -52,7 +53,7 @@ class AdManager {
         fun showInterstitialAd(activity: Activity) {
             InterstitialAd.load(
                     activity,
-                    "ca-app-pub-3940256099942544/1033173712",
+                    BuildConfig.playerFragmentPauseInterstitialAdId,
                     AdRequest.Builder().build(),
                     object : InterstitialAdLoadCallback() {
                         override fun onAdLoaded(interstitialAd: InterstitialAd) {

@@ -19,13 +19,9 @@
     <string name="moodlight_could_not_find_spotify_title">Could not find spotify</string>
     <string name="moodlight_could_not_find_spotify_description">This app requires spotify to be downloaded on your device.  Please download spotify and re-open the app.</string>
     <string name="moodlight_could_not_find_spotify_go_to_download">Go to download</string>
-    <string name="moodlight_could_not_find_spotify_exit">Exit</string>
-    <string name="moodlight_spotify_auth_fail_title">App not authorized</string>
-    <string name="moodlight_spotify_auth_fail_description">Spotify authorization was declined, please re-open the app and authorize this app to access spotify.</string>
-    <string name="moodlight_spotify_auth_fail_exit">Exit</string>
-    <string name="moodlight_spotify_auth_fail_cancel">Cancel</string>
+    <string name="moodlight_could_not_find_spotify_cancel">Cancel</string>
     <string name="moodlight_spotify_login_fail_title">Not logged in to spotify</string>
     <string name="moodlight_spotify_login_fail_description">No logged in user found for spotify.  Please login to spotify and re-open the app</string>
-    <string name="moodlight_spotify_login_fail_exit">Exit</string>
+    <string name="moodlight_spotify_login_fail_launch_spotify">Launch Spotify</string>
     <string name="moodlight_spotify_login_fail_cancel">Cancel</string>
 </resources>

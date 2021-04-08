@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.zachary_moore.huekontrollr.Kontrollr
 import com.zachary_moore.moodlights.R
 
@@ -12,6 +13,12 @@ class HueDiscoveryFeature {
     private val kontrollrLiveData: MutableLiveData<Kontrollr> = MutableLiveData()
 
     fun getKontrollr(): LiveData<Kontrollr> = kontrollrLiveData
+
+    fun isConnected(): LiveData<Boolean> = Transformations.distinctUntilChanged(
+            Transformations.map(kontrollrLiveData) {
+                it != null
+            }
+    )
 
     fun loadSharedPreferences(context: Context) {
         // Avoid unnecessary calls and just return if we already have a value

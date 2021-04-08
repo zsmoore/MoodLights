@@ -17,7 +17,6 @@ import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.android.appremote.api.error.CouldNotFindSpotifyApp
 import com.spotify.android.appremote.api.error.NotLoggedInException
-import com.spotify.android.appremote.api.error.UserNotAuthorizedException
 import com.spotify.protocol.types.ImageUri
 import com.spotify.protocol.types.Track
 import com.zachary_moore.moodlights.BuildConfig
@@ -203,6 +202,15 @@ class SpotifyFeature {
             }
         }
 
+        private fun launchSpotifyForLogin(context: Context) {
+            val uri: Uri = Uri.parse("spotify:")
+                    .buildUpon()
+                    .build()
+            context.startActivity(Intent(Intent.ACTION_VIEW, uri).apply {
+                putExtra(Intent.EXTRA_REFERRER, context.packageName)
+            })
+        }
+
         private fun handleSpotifyError(
                 throwable: Throwable?,
                 activity: Activity
@@ -215,31 +223,16 @@ class SpotifyFeature {
                             dialog.dismiss()
                             promptSpotifyDownload(activity)
                         }
-                        .setNegativeButton(R.string.moodlight_could_not_find_spotify_exit) { dialog, _ ->
-                            dialog.dismiss()
-                            // Exit app
-                            activity.finishAffinity()
-                        }
-                        .show()
-                is UserNotAuthorizedException -> AlertDialog.Builder(activity)
-                        .setTitle(R.string.moodlight_spotify_auth_fail_title)
-                        .setMessage(R.string.moodlight_spotify_auth_fail_description)
-                        .setPositiveButton(R.string.moodlight_spotify_auth_fail_exit) { dialog, _ ->
-                            dialog.dismiss()
-                            // Exit app
-                            activity.finishAffinity()
-                        }
-                        .setNegativeButton(R.string.moodlight_spotify_auth_fail_cancel) { dialog, _ ->
+                        .setNegativeButton(R.string.moodlight_could_not_find_spotify_cancel) { dialog, _ ->
                             dialog.dismiss()
                         }
                         .show()
                 is NotLoggedInException -> AlertDialog.Builder(activity)
                         .setTitle(R.string.moodlight_spotify_login_fail_title)
                         .setMessage(R.string.moodlight_spotify_login_fail_description)
-                        .setPositiveButton(R.string.moodlight_spotify_login_fail_exit) { dialog, _ ->
+                        .setPositiveButton(R.string.moodlight_spotify_login_fail_launch_spotify) { dialog, _ ->
                             dialog.dismiss()
-                            // Exit app
-                            activity.finishAffinity()
+                            launchSpotifyForLogin(activity)
                         }
                         .setNegativeButton(R.string.moodlight_spotify_login_fail_cancel) { dialog, _ ->
                             dialog.dismiss()
