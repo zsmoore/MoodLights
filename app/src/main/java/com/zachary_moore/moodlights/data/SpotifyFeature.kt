@@ -168,7 +168,7 @@ class SpotifyFeature {
             "App remote doesn't exist after track found while trying to get bitmap for album image"
         }.let {
             it.imagesApi.getImage(currentPlayingAlbumImage).setResultCallback { resultBitmap ->
-                currentPlayingAlbumBitmap.value = resultBitmap
+                currentPlayingAlbumBitmap.postValue(resultBitmap)
             }
         }
     }
