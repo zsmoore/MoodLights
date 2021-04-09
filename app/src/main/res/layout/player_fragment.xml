@@ -125,6 +125,7 @@
                     android:background="@android:drawable/ic_media_previous"
                     android:contentDescription="@string/moodlight_previous_content_description"
                     android:onClick="@{() -> viewModel.spotifyFeature.previous()}"
+                    android:backgroundTint="?android:textColorPrimary"
                     android:paddingStart="2dp"
                     android:paddingEnd="2dp" />
 
@@ -135,6 +136,7 @@
                     android:onClick="@{() -> viewModel.spotifyFeature.togglePlay()}"
                     android:paddingStart="2dp"
                     android:paddingEnd="2dp"
+                    android:backgroundTint="?android:textColorPrimary"
                     app:backgroundResource="@{viewModel.spotifyFeature.isPaused() ? R.drawable.ic_media_play : R.drawable.ic_media_pause}"
                     tools:src="@android:drawable/ic_media_play" />
 
@@ -142,6 +144,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="@android:drawable/ic_media_next"
+                    android:backgroundTint="?android:textColorPrimary"
                     android:contentDescription="@string/moodlight_next_content_description"
                     android:onClick="@{() -> viewModel.spotifyFeature.next()}"
                     android:paddingStart="2dp"
