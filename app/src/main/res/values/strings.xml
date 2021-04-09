@@ -5,7 +5,7 @@
     <string name="moodlight_next_content_description">Go to next song</string>
     <string name="moodlight_toggle_play_pause_description">Toggle between play and pause</string>
     <string name="moodlight_press_bridge_title">Please press your hue bridge</string>
-    <string name="moodlight_press_bridge_description">In order to connect to hue lights we need to enable the application to connect to your hue bridge.  To do this you need to click the center button of your bridge and immediately hit continue.  If you cancel, the app will not function until you re-open and accept.  If you hit continue and the app doesn\'t function, make sure your hue bridge is connected to the same wifi network as your phone.  If errors keep happening please file a bug.</string>
+    <string name="moodlight_press_bridge_description">In order to connect to hue lights we need to enable the application to connect to your hue bridge.  To do this you need to click the center button of your bridge and immediately hit continue.  If you cancel, the app will not function until you re-open and accept.  If you hit continue and the app doesn\'t function, make sure your hue bridge is connected to the same wifi network as your device.  If errors keep happening please file a bug.</string>
     <string name="moodlight_press_bridge_continue">Continue</string>
     <string name="moodlight_press_bridge_cancel">Cancel</string>
     <string name="moodlight_saved_bridge_cleared_title">Saved Bridge Cleared</string>
