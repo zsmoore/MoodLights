@@ -45,7 +45,7 @@
                 android:layout_marginEnd="12dp"
                 android:onClick="@{() -> viewModel.hueDiscoveryFeature.resetSavedDiscoveryCredentials(context)}"
                 android:text="@string/moodlight_reset_bridge_button"
-                android:visibility="@{viewModel.hueDiscoveryFeature.isConnected() ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.hueDiscoveryFeature.isConnected() ? View.VISIBLE : View.INVISIBLE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
