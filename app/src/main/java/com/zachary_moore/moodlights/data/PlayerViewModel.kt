@@ -7,24 +7,28 @@ import com.zachary_moore.huekontrollr.Kontrollr
 import com.zachary_moore.huekontrollr.data.light.Light
 import com.zachary_moore.huekontrollr.data.light.State
 import com.zachary_moore.huekontrollr.util.getFromRGB
+import com.zachary_moore.moodlights.view.ads.AdManager
 
 class PlayerViewModel : ViewModel() {
 
     val spotifyFeature = SpotifyFeature()
     val hueDiscoveryFeature = HueDiscoveryFeature()
+    val adManager = AdManager()
     private val swatchStateManager = SwatchStateManager()
     private val threadingManager = ThreadingManager()
 
-    private val kontrollrData = Transformations.distinctUntilChanged(hueDiscoveryFeature.getKontrollr())
-    private val palette: LiveData<Palette> = Transformations.map(spotifyFeature.currentPlayingAlbumImage()) {
-        Palette.from(it).generate()
-    }
+    private val kontrollrData =
+        Transformations.distinctUntilChanged(hueDiscoveryFeature.getKontrollr())
+    private val palette: LiveData<Palette> =
+        Transformations.map(spotifyFeature.currentPlayingAlbumImage()) {
+            Palette.from(it).generate()
+        }
     private val lightMapAndPalette: LiveData<Pair<Map<Int, Light>?, Palette?>>
     private val lightMapAndPausedState: LiveData<Pair<Map<Int, Light>?, Boolean?>>
     private val lightMap: MutableLiveData<Map<Int, Light>> = MutableLiveData()
 
     private val isPausedObserver: Observer<Pair<Map<Int, Light>?, Boolean?>> = getIsPausedObserver()
-    private val paletteObserver: Observer<Pair<Map< Int, Light>?, Palette?>> = getPaletteObserver()
+    private val paletteObserver: Observer<Pair<Map<Int, Light>?, Palette?>> = getPaletteObserver()
     private val kontrollrObserver = Observer<Kontrollr> { kontrollr ->
         kontrollr?.lights?.getAll {
             // fuel is used internally in HueKontrollr, this makes requests on a background thread
@@ -75,22 +79,22 @@ class PlayerViewModel : ViewModel() {
     private fun getLightMapAndPausedStateLiveData(
         lightMapLiveData: LiveData<Map<Int, Light>>
     ): LiveData<Pair<Map<Int, Light>?, Boolean?>> = Transformations.distinctUntilChanged(
-            MediatorLiveData<Pair<Map<Int, Light>?, Boolean?>>().apply {
-                addSource(lightMapLiveData) { updatedMap ->
-                    if (updatedMap != null) {
-                        value = value?.let {
-                            updatedMap to it.second
-                        } ?: updatedMap to null
-                    }
-                }
-
-                addSource(spotifyFeature.isPaused()) { updatedBoolean ->
+        MediatorLiveData<Pair<Map<Int, Light>?, Boolean?>>().apply {
+            addSource(lightMapLiveData) { updatedMap ->
+                if (updatedMap != null) {
                     value = value?.let {
-                        Pair(it.first, updatedBoolean == true)
-                    } ?: Pair(null, updatedBoolean == true)
+                        updatedMap to it.second
+                    } ?: updatedMap to null
                 }
             }
-        )
+
+            addSource(spotifyFeature.isPaused()) { updatedBoolean ->
+                value = value?.let {
+                    Pair(it.first, updatedBoolean == true)
+                } ?: Pair(null, updatedBoolean == true)
+            }
+        }
+    )
 
     override fun onCleared() {
         super.onCleared()

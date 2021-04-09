@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.zachary_moore.huekontrollr.Kontrollr
 import com.zachary_moore.moodlights.R
 
@@ -12,6 +13,12 @@ class HueDiscoveryFeature {
     private val kontrollrLiveData: MutableLiveData<Kontrollr> = MutableLiveData()
 
     fun getKontrollr(): LiveData<Kontrollr> = kontrollrLiveData
+
+    fun isConnected(): LiveData<Boolean> = Transformations.distinctUntilChanged(
+        Transformations.map(kontrollrLiveData) {
+            it != null
+        }
+    )
 
     fun loadSharedPreferences(context: Context) {
         // Avoid unnecessary calls and just return if we already have a value
@@ -87,7 +94,7 @@ class HueDiscoveryFeature {
 
         sharedPreferences.edit().remove(USERNAME_KEY).apply()
         sharedPreferences.edit().remove(IP_KEY).apply()
-        kontrollrLiveData.value = null
+        kontrollrLiveData.postValue(null)
 
         AlertDialog.Builder(context)
             .setTitle(R.string.moodlight_saved_bridge_cleared_title)
@@ -105,5 +112,4 @@ class HueDiscoveryFeature {
         private const val APPLICATION_NAME = "MoodLights"
         private const val DEVICE_NAME = "MoodLights_Android"
     }
-
 }
