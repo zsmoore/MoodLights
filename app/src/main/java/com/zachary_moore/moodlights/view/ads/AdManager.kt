@@ -29,7 +29,7 @@ class AdManager {
         private const val PAUSE_AD_THRESHOLD = 2
 
         fun ViewGroup.addBannerAd(
-                activity: Activity
+            activity: Activity
         ) {
             MobileAds.initialize(activity)
 
@@ -52,14 +52,14 @@ class AdManager {
 
         fun showInterstitialAd(activity: Activity) {
             InterstitialAd.load(
-                    activity,
-                    BuildConfig.playerFragmentPauseInterstitialAdId,
-                    AdRequest.Builder().build(),
-                    object : InterstitialAdLoadCallback() {
-                        override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                            interstitialAd.show(activity)
-                        }
+                activity,
+                BuildConfig.playerFragmentPauseInterstitialAdId,
+                AdRequest.Builder().build(),
+                object : InterstitialAdLoadCallback() {
+                    override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                        interstitialAd.show(activity)
                     }
+                }
             )
         }
     }

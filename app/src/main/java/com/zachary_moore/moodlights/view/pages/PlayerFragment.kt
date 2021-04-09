@@ -27,15 +27,15 @@ class PlayerFragment : Fragment() {
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         playerFragmentBinding = DataBindingUtil.inflate(
-                inflater,
-                R.layout.player_fragment,
-                container,
-                false
+            inflater,
+            R.layout.player_fragment,
+            container,
+            false
         )
 
         playerFragmentBinding.moodlightBannerAdContainer.addBannerAd(requireActivity())

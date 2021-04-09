@@ -17,10 +17,12 @@ class PlayerViewModel : ViewModel() {
     private val swatchStateManager = SwatchStateManager()
     private val threadingManager = ThreadingManager()
 
-    private val kontrollrData = Transformations.distinctUntilChanged(hueDiscoveryFeature.getKontrollr())
-    private val palette: LiveData<Palette> = Transformations.map(spotifyFeature.currentPlayingAlbumImage()) {
-        Palette.from(it).generate()
-    }
+    private val kontrollrData =
+        Transformations.distinctUntilChanged(hueDiscoveryFeature.getKontrollr())
+    private val palette: LiveData<Palette> =
+        Transformations.map(spotifyFeature.currentPlayingAlbumImage()) {
+            Palette.from(it).generate()
+        }
     private val lightMapAndPalette: LiveData<Pair<Map<Int, Light>?, Palette?>>
     private val lightMapAndPausedState: LiveData<Pair<Map<Int, Light>?, Boolean?>>
     private val lightMap: MutableLiveData<Map<Int, Light>> = MutableLiveData()
@@ -49,25 +51,25 @@ class PlayerViewModel : ViewModel() {
      * and a [LiveData] of a [Palette] derived from [SpotifyFeature.currentPlayingAlbumImage]
      */
     private fun getLightMapAndPaletteLiveData(
-            lightMapLiveData: LiveData<Map<Int, Light>>
+        lightMapLiveData: LiveData<Map<Int, Light>>
     ): LiveData<Pair<Map<Int, Light>?, Palette?>> = Transformations.distinctUntilChanged(
-            MediatorLiveData<Pair<Map<Int, Light>?, Palette?>>().apply {
-                addSource(lightMapLiveData) { updatedMap ->
-                    if (updatedMap != null) {
-                        value = value?.let {
-                            updatedMap to it.second
-                        } ?: updatedMap to null
-                    }
-                }
-
-                addSource(palette) { updatedPalette ->
-                    if (updatedPalette != null) {
-                        value = value?.let {
-                            it.first to updatedPalette
-                        } ?: null to updatedPalette
-                    }
+        MediatorLiveData<Pair<Map<Int, Light>?, Palette?>>().apply {
+            addSource(lightMapLiveData) { updatedMap ->
+                if (updatedMap != null) {
+                    value = value?.let {
+                        updatedMap to it.second
+                    } ?: updatedMap to null
                 }
             }
+
+            addSource(palette) { updatedPalette ->
+                if (updatedPalette != null) {
+                    value = value?.let {
+                        it.first to updatedPalette
+                    } ?: null to updatedPalette
+                }
+            }
+        }
     )
 
     /**
@@ -75,23 +77,23 @@ class PlayerViewModel : ViewModel() {
      * and a [LiveData] of user pause state derived from [SpotifyFeature.isPaused]
      */
     private fun getLightMapAndPausedStateLiveData(
-            lightMapLiveData: LiveData<Map<Int, Light>>
+        lightMapLiveData: LiveData<Map<Int, Light>>
     ): LiveData<Pair<Map<Int, Light>?, Boolean?>> = Transformations.distinctUntilChanged(
-            MediatorLiveData<Pair<Map<Int, Light>?, Boolean?>>().apply {
-                addSource(lightMapLiveData) { updatedMap ->
-                    if (updatedMap != null) {
-                        value = value?.let {
-                            updatedMap to it.second
-                        } ?: updatedMap to null
-                    }
-                }
-
-                addSource(spotifyFeature.isPaused()) { updatedBoolean ->
+        MediatorLiveData<Pair<Map<Int, Light>?, Boolean?>>().apply {
+            addSource(lightMapLiveData) { updatedMap ->
+                if (updatedMap != null) {
                     value = value?.let {
-                        Pair(it.first, updatedBoolean == true)
-                    } ?: Pair(null, updatedBoolean == true)
+                        updatedMap to it.second
+                    } ?: updatedMap to null
                 }
             }
+
+            addSource(spotifyFeature.isPaused()) { updatedBoolean ->
+                value = value?.let {
+                    Pair(it.first, updatedBoolean == true)
+                } ?: Pair(null, updatedBoolean == true)
+            }
+        }
     )
 
     override fun onCleared() {
@@ -132,12 +134,12 @@ class PlayerViewModel : ViewModel() {
             threadingManager.startLightTask(Runnable {
                 val swatch = swatchStateManager.getNextSwatch()
                 updateLights(
-                        lightIds,
-                        swatch
+                    lightIds,
+                    swatch
                 )
 
                 threadingManager.postDelayedCurrentLightTask(
-                        swatchStateManager.getSwatchDisplayTime(swatch)
+                    swatchStateManager.getSwatchDisplayTime(swatch)
                 )
             })
         }
@@ -147,8 +149,8 @@ class PlayerViewModel : ViewModel() {
      * Simply call [applySwatchToLight] on all [lightIds]
      */
     private fun updateLights(
-            lightIds: Set<Int>,
-            swatch: Palette.Swatch
+        lightIds: Set<Int>,
+        swatch: Palette.Swatch
     ) {
         lightIds.forEach { lightId ->
             applySwatchToLight(swatch, lightId)
@@ -160,16 +162,16 @@ class PlayerViewModel : ViewModel() {
      * a light with a specified [lightId]
      */
     private fun applySwatchToLight(
-            swatch: Palette.Swatch,
-            lightId: Int
+        swatch: Palette.Swatch,
+        lightId: Int
     ) {
         val rgb = swatch.rgb
         val r = Color.red(rgb)
         val g = Color.green(rgb)
         val b = Color.blue(rgb)
         kontrollrData.value?.lights?.putState(
-                lightId,
-                State(xy = getFromRGB(r, g, b))
+            lightId,
+            State(xy = getFromRGB(r, g, b))
         )
     }
 
@@ -196,8 +198,8 @@ class PlayerViewModel : ViewModel() {
             // Turn on or off lights according to new pause state
             lightMap.keys.forEach { key ->
                 kontrollrData.value?.lights?.putState(
-                        key,
-                        State(on = !isPaused)
+                    key,
+                    State(on = !isPaused)
                 )
             }
         }
@@ -212,8 +214,8 @@ class PlayerViewModel : ViewModel() {
         kontrollrData.value?.lights?.getAll { lightMap ->
             lightMap.keys.forEach { lightId ->
                 kontrollrData.value?.lights?.putState(
-                        lightId,
-                        State(on = false)
+                    lightId,
+                    State(on = false)
                 )
             }
         }

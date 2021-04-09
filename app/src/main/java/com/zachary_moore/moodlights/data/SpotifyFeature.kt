@@ -31,33 +31,34 @@ class SpotifyFeature {
 
     // Expose direct maps since they are immutable
     private val currentPlayingAlbumImage = Transformations.distinctUntilChanged(
-            Transformations.map(currentTrack) {
-                it.imageUri
-            }
+        Transformations.map(currentTrack) {
+            it.imageUri
+        }
     )
     val currentTrackName = Transformations.distinctUntilChanged(
-            Transformations.map(currentTrack) {
-                it.name
-            }
+        Transformations.map(currentTrack) {
+            it.name
+        }
     )
     val currentArtistName = Transformations.distinctUntilChanged(
-            Transformations.map(currentTrack) {
-                it.artist.name
-            }
+        Transformations.map(currentTrack) {
+            it.artist.name
+        }
     )
     val currentAlbumName = Transformations.distinctUntilChanged(
-            Transformations.map(currentTrack) {
-                it.album.name
-            }
+        Transformations.map(currentTrack) {
+            it.album.name
+        }
     )
 
     private val connectionParams = ConnectionParams.Builder(BuildConfig.spotifyClientId)
-            .setRedirectUri(BuildConfig.spotifyRedirectUri)
-            .showAuthView(true)
-            .build()
+        .setRedirectUri(BuildConfig.spotifyRedirectUri)
+        .showAuthView(true)
+        .build()
 
     private val appRemoteObserver: Observer<SpotifyAppRemote> = getSpotifyAppRemoteObserver()
-    private val currentAlbumImageObserver: Observer<ImageUri> = getCurrentPlayingAlbumImageObserver()
+    private val currentAlbumImageObserver: Observer<ImageUri> =
+        getCurrentPlayingAlbumImageObserver()
 
     init {
         appRemote.observeForever(appRemoteObserver)
@@ -71,7 +72,8 @@ class SpotifyFeature {
 
     fun isPaused(): LiveData<Boolean> = Transformations.distinctUntilChanged(isPaused)
 
-    fun currentPlayingAlbumImage(): LiveData<Bitmap> = Transformations.distinctUntilChanged(currentPlayingAlbumBitmap)
+    fun currentPlayingAlbumImage(): LiveData<Bitmap> =
+        Transformations.distinctUntilChanged(currentPlayingAlbumBitmap)
 
     /**
      * Toggle pause / resume
@@ -122,23 +124,23 @@ class SpotifyFeature {
      */
     fun initializeRemote(activity: Activity) {
         SpotifyAppRemote.connect(
-                activity,
-                connectionParams,
-                object : Connector.ConnectionListener {
-                    override fun onFailure(throwable: Throwable?) {
-                        Log.e(
-                                TAG,
-                                throwable?.message,
-                                throwable
-                        )
-                        handleSpotifyError(throwable, activity)
-                    }
-
-                    override fun onConnected(appRemote: SpotifyAppRemote) {
-                        this@SpotifyFeature.appRemote.postValue(appRemote)
-                    }
-
+            activity,
+            connectionParams,
+            object : Connector.ConnectionListener {
+                override fun onFailure(throwable: Throwable?) {
+                    Log.e(
+                        TAG,
+                        throwable?.message,
+                        throwable
+                    )
+                    handleSpotifyError(throwable, activity)
                 }
+
+                override fun onConnected(appRemote: SpotifyAppRemote) {
+                    this@SpotifyFeature.appRemote.postValue(appRemote)
+                }
+
+            }
         )
     }
 
@@ -169,75 +171,77 @@ class SpotifyFeature {
      *
      * This function assumes app remote has a value rather than mediating with it
      */
-    private fun getCurrentPlayingAlbumImageObserver() = Observer<ImageUri> { currentPlayingAlbumImage ->
-        checkNotNull(appRemote.value) {
-            "App remote doesn't exist after track found while trying to get bitmap for album image"
-        }.let {
-            it.imagesApi.getImage(currentPlayingAlbumImage).setResultCallback { resultBitmap ->
-                currentPlayingAlbumBitmap.postValue(resultBitmap)
+    private fun getCurrentPlayingAlbumImageObserver() =
+        Observer<ImageUri> { currentPlayingAlbumImage ->
+            checkNotNull(appRemote.value) {
+                "App remote doesn't exist after track found while trying to get bitmap for album image"
+            }.let {
+                it.imagesApi.getImage(currentPlayingAlbumImage).setResultCallback { resultBitmap ->
+                    currentPlayingAlbumBitmap.postValue(resultBitmap)
+                }
             }
         }
-    }
 
     companion object {
         private const val TAG = "SpotifyFeature"
         private const val appPackageName = "com.spotify.music"
-        private const val referrer = "adjust_campaign=PACKAGE_NAME&adjust_tracker=ndjczk&utm_source=adjust_preinstall"
+        private const val referrer =
+            "adjust_campaign=PACKAGE_NAME&adjust_tracker=ndjczk&utm_source=adjust_preinstall"
 
         private fun promptSpotifyDownload(context: Context) {
             try {
                 val uri: Uri = Uri.parse("market://details")
-                        .buildUpon()
-                        .appendQueryParameter("id", appPackageName)
-                        .appendQueryParameter("referrer", referrer)
-                        .build()
+                    .buildUpon()
+                    .appendQueryParameter("id", appPackageName)
+                    .appendQueryParameter("referrer", referrer)
+                    .build()
                 context.startActivity(Intent(Intent.ACTION_VIEW, uri))
             } catch (ignored: ActivityNotFoundException) {
                 val uri: Uri = Uri.parse("https://play.google.com/store/apps/details")
-                        .buildUpon()
-                        .appendQueryParameter("id", appPackageName)
-                        .appendQueryParameter("referrer", referrer)
-                        .build()
+                    .buildUpon()
+                    .appendQueryParameter("id", appPackageName)
+                    .appendQueryParameter("referrer", referrer)
+                    .build()
                 context.startActivity(Intent(Intent.ACTION_VIEW, uri))
             }
         }
 
         private fun launchSpotifyForLogin(context: Context) {
             val uri: Uri = Uri.parse("spotify:")
-                    .buildUpon()
-                    .build()
+                .buildUpon()
+                .build()
             context.startActivity(Intent(Intent.ACTION_VIEW, uri).apply {
                 putExtra(Intent.EXTRA_REFERRER, context.packageName)
             })
         }
 
         private fun handleSpotifyError(
-                throwable: Throwable?,
-                activity: Activity
+            throwable: Throwable?,
+            activity: Activity
         ) {
             when (throwable) {
                 is CouldNotFindSpotifyApp -> AlertDialog.Builder(activity)
-                        .setTitle(R.string.moodlight_could_not_find_spotify_title)
-                        .setMessage(R.string.moodlight_could_not_find_spotify_description)
-                        .setPositiveButton(R.string.moodlight_could_not_find_spotify_go_to_download) { dialog, _ ->
-                            dialog.dismiss()
-                            promptSpotifyDownload(activity)
-                        }
-                        .setNegativeButton(R.string.moodlight_could_not_find_spotify_cancel) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .show()
+                    .setTitle(R.string.moodlight_could_not_find_spotify_title)
+                    .setMessage(R.string.moodlight_could_not_find_spotify_description)
+                    .setPositiveButton(R.string.moodlight_could_not_find_spotify_go_to_download) { dialog, _ ->
+                        dialog.dismiss()
+                        promptSpotifyDownload(activity)
+                    }
+                    .setNegativeButton(R.string.moodlight_could_not_find_spotify_cancel) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
                 is NotLoggedInException -> AlertDialog.Builder(activity)
-                        .setTitle(R.string.moodlight_spotify_login_fail_title)
-                        .setMessage(R.string.moodlight_spotify_login_fail_description)
-                        .setPositiveButton(R.string.moodlight_spotify_login_fail_launch_spotify) { dialog, _ ->
-                            dialog.dismiss()
-                            launchSpotifyForLogin(activity)
-                        }
-                        .setNegativeButton(R.string.moodlight_spotify_login_fail_cancel) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .show()
+                    .setTitle(R.string.moodlight_spotify_login_fail_title)
+                    .setMessage(R.string.moodlight_spotify_login_fail_description)
+                    .setPositiveButton(R.string.moodlight_spotify_login_fail_launch_spotify) { dialog, _ ->
+                        dialog.dismiss()
+                        launchSpotifyForLogin(activity)
+                    }
+                    .setNegativeButton(R.string.moodlight_spotify_login_fail_cancel) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .show()
             }
         }
     }
