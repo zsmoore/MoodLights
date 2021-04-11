@@ -55,10 +55,10 @@ dependencies {
     implementation "androidx.multidex:multidex:2.0.1"
 
     // mine
-    implementation "com.google.code.gson:gson:2.8.5"
-    implementation project(":spotify-app-remote-release-0.7.1")
-    implementation project(":spotify-auth-release-1.2.3")
+    implementation "com.google.code.gson:gson:2.8.6"
     implementation ('com.zachary-moore:huekontrollr:0.0.1')
+    compile(name:'spotify-app-remote-release-0.7.1', ext:'aar')
+    compile(name:'spotify-auth-release-1.2.3', ext:'aar')
 }
 
 secrets {
